@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:very_simple_online_shop_cubit/cubit/online_shop/product_cubit.dart';
-import 'package:very_simple_online_shop_cubit/cubit/online_shop/product_state.dart';
 import 'package:very_simple_online_shop_cubit/data/models/product.dart';
+import 'package:very_simple_online_shop_cubit/logic/blocs/product/product_bloc.dart';
 import 'package:very_simple_online_shop_cubit/ui/widgets/product_container.dart';
 
 class FavoriteScreen extends StatelessWidget {
@@ -14,12 +13,12 @@ class FavoriteScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Favorite products'),
       ),
-      body: BlocBuilder<ProductCubit, ProductState>(
+      body: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
-          if (state is InitialState) {
+          if (state is InitialProductState) {
             return const Center(child: Text('Add products!'));
           } else {
-            final List<Product> favProducts = (state as LoadedState)
+            final List<Product> favProducts = (state as LoadedProductState)
                 .products
                 .where((element) => element.isFavorite)
                 .toList();

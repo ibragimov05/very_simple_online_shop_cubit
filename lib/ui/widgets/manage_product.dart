@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:very_simple_online_shop_cubit/cubit/online_shop/product_cubit.dart';
 import 'package:very_simple_online_shop_cubit/data/models/product.dart';
+import 'package:very_simple_online_shop_cubit/logic/blocs/product/product_bloc.dart';
 
 class ManageProduct extends StatefulWidget {
   final bool isEdit;
@@ -29,7 +29,7 @@ class _ManageProductState extends State<ManageProduct> {
 
   @override
   Widget build(BuildContext context) {
-    final ProductCubit productCubit = context.read<ProductCubit>();
+    final ProductBloc productBloc = context.read<ProductBloc>();
     return AlertDialog(
       title: Text(widget.isEdit ? 'Edit Product' : 'Add Product'),
       content: Form(
@@ -69,15 +69,19 @@ class _ManageProductState extends State<ManageProduct> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               if (widget.isEdit && widget.product != null) {
-                productCubit.editProduct(
-                  id: widget.product!.id,
-                  title: _productNameController.text,
-                  imageUrl: _imageUrlController.text,
+                productBloc.add(
+                  EditProductEvent(
+                    id: widget.product!.id,
+                    title: _productNameController.text,
+                    imageUrl: _imageUrlController.text,
+                  ),
                 );
               } else {
-                productCubit.addProduct(
-                  title: _productNameController.text,
-                  imageUrl: _imageUrlController.text,
+                productBloc.add(
+                  AddProductEvent(
+                    title: _productNameController.text,
+                    imageUrl: _imageUrlController.text,
+                  ),
                 );
               }
               Navigator.of(context).pop();

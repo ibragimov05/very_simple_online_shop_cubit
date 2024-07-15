@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:very_simple_online_shop_cubit/cubit/online_shop/product_cubit.dart';
 import 'package:very_simple_online_shop_cubit/data/models/product.dart';
+import 'package:very_simple_online_shop_cubit/logic/blocs/cart/cart_bloc.dart';
+import 'package:very_simple_online_shop_cubit/logic/blocs/product/product_bloc.dart';
 import 'package:very_simple_online_shop_cubit/ui/widgets/manage_product.dart';
 
 class ProductContainer extends StatelessWidget {
@@ -18,7 +19,6 @@ class ProductContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 80,
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -37,34 +37,52 @@ class ProductContainer extends StatelessWidget {
           const Gap(10),
           Expanded(child: Text(product.title)),
           const Gap(10),
-          Row(
+          Column(
             children: [
-              IconButton(
-                onPressed: () =>
-                    context.read<ProductCubit>().toggleFavorite(id: product.id),
-                icon: Icon(
-                  product.isFavorite ? Icons.favorite : Icons.favorite_border,
-                ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => ManageProduct(
+                          isEdit: true,
+                          product: product,
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
+                  IconButton(
+                    onPressed: () => context
+                        .read<ProductBloc>()
+                        .add(RemoveProductEvent(id: product.id)),
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                  ),
+                ],
               ),
-              IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => ManageProduct(
-                      isEdit: true,
-                      product: product,
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => context
+                        .read<ProductBloc>()
+                        .add(ToggleFavoriteEvent(id: product.id)),
+                    icon: Icon(
+                      product.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
                     ),
-                  );
-                },
-                icon: const Icon(Icons.edit),
-              ),
-              IconButton(
-                onPressed: () =>
-                    context.read<ProductCubit>().removeProduct(id: product.id),
-                icon: const Icon(Icons.delete, color: Colors.red),
+                  ),
+                  IconButton(
+                    onPressed: () => context
+                        .read<CartBloc>()
+                        .add(AddProductToCartEvent(product: product)),
+                    icon: const Icon(Icons.add_shopping_cart_outlined),
+                  ),
+                ],
               ),
             ],
-          )
+          ),
         ],
       ),
     );
